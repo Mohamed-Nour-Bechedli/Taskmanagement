@@ -77,15 +77,29 @@ const updateProduct = async (req, res) => {
 // Delete a product
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ error: "Product not found" });
         }
-        res.json(product);
+
+        // Delete image file if exists
+        if (product.image) {
+            const imagePath = path.join(__dirname, "../", product.image);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        // Delete product from DB
+        await Product.findByIdAndDelete(req.params.id);
+
+        res.json({ message: "Product deleted successfully", product });
     } catch (error) {
-        res.status(500).json({ error: "delete the product failed" });
+        console.error(error);
+        res.status(500).json({ error: "Delete product failed" });
     }
-}
+};
+
 
 // file upload endpoint
 const uploadSingle = async (req, res) => {

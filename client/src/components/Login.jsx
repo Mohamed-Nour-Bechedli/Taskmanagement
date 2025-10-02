@@ -1,83 +1,107 @@
-import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
-import axios from "axios"
-
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
-
     const [data, setData] = useState({
-        email : "",
-        password : ""
-    })
+        email: "",
+        password: ""
+    });
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setData( {...data, [e.target.name] : e.target.value})
-    }
+        setData({ ...data, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // sbumit data to backend
         try {
-            const url = "http://localhost:5000/api/auth/login"
-            const {data : res} = await axios.post(url, data);
+            const url = "http://localhost:5000/api/auth/login";
+            const { data: res } = await axios.post(url, data);
             console.log("Login response:", res);
 
-            localStorage.setItem('token', res.data);
-            navigate('/');
+            localStorage.setItem("token", res.data);
+            navigate("/");
         } catch (error) {
-            if (error.response &&
+            if (
+                error.response &&
                 error.response.status >= 400 &&
                 error.response.status <= 500
             ) {
                 setError(error.response.data.message);
             }
         }
-        
+    };
 
-    }
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+            <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+                <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+                    Login to your account
+                </h2>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            Your email
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={data.email}
+                            onChange={handleChange}
+                            placeholder="name@flowbite.com"
+                            required
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                    </div>
 
-  return (
-    <div className="login-container">
-      <div className="login-form-container">
-        
-      </div>
-      <div className="form-container">
-        <h2>Login to your account</h2>
-        <form className="signup-form" onSubmit={handleSubmit}>
+                    <div>
+                        <label
+                            htmlFor="password"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            Your password
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={data.password}
+                            onChange={handleChange}
+                            required
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                    </div>
 
-            <input 
-                type="email" 
-                placeholder="Email" 
-                name="email" 
-                value={data.email} 
-                onChange={handleChange} 
-                required
-                className="input-field" 
-            />
-            <input 
-                type="password" 
-                placeholder="Password" 
-                name="password" 
-                value={data.password} 
-                onChange={handleChange} 
-                required
-                className="input-field" 
-            />
-            {error && <div className="error-msg">{error}</div>}
-            <button className="submit-btn" type="submit">Sign In</button>
-        </form>
-      </div>
-      <div className="login-link">
-        <h2>New here?</h2>
-        <Link to='/signup'>
-            <button className="signup-btn">Sign Up</button>
-        </Link>
-      </div>
-    </div>
-  )
-}
+                    {error && (
+                        <div className="text-red-500 text-sm font-medium">{error}</div>
+                    )}
 
-export default Login
+                    <button
+                        type="submit"
+                        className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        Sign In
+                    </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                    <p className="text-gray-600 dark:text-gray-300">New here?</p>
+                    <Link to="/signup">
+                        <button className="mt-2 w-full text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-5 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            Sign Up
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Login;

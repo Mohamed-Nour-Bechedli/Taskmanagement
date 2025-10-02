@@ -3,17 +3,23 @@ import { Trash2, Pencil, Plus } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Pagination from "./Pagination"; // 👈 import pagination component
 
 const Product = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editName, setEditName] = useState("");
   const [editImage, setEditImage] = useState(null);
+  const [search, setSearch] = useState("");
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 4;
 
   const fetchData = async () => {
     try {
@@ -29,7 +35,6 @@ const Product = () => {
   }, []);
 
   const removeProduct = async (id) => {
-
     const confirmed = window.confirm("Are you sure you want to delete this product?");
     if (!confirmed) return;
 
@@ -38,7 +43,6 @@ const Product = () => {
       setProducts((prev) => prev.filter((p) => p._id !== id));
 
       toast.info("Product deleted successfully");
-
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete product");
@@ -62,7 +66,6 @@ const Product = () => {
       fetchData();
 
       toast.success("Product added successfully!");
-
     } catch (err) {
       console.error(err);
       toast.error("Failed to add product");
@@ -92,66 +95,91 @@ const Product = () => {
     }
   };
 
+  // Filter products
+  const filterProducts = products.filter((product) =>
+    product.productName.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filterProducts.length / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const currentProducts = filterProducts.slice(
+    startIndex,
+    startIndex + productsPerPage
+  );
+
   return (
-
     <div className="max-w-6xl mx-auto mt-8">
-
       <ToastContainer position="top-right" autoClose={2000} />
+
+      {/* Toolbar above table */}
+      <div className="flex justify-between items-center mb-4">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-48"
+        />
+        <button
+          onClick={() => setIsAddOpen(true)}
+          className="ml-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center transition-transform transform hover:-translate-y-0.5 hover:scale-105"
+        >
+          <Plus className="w-4 h-4 mr-1" /> Add
+        </button>
+      </div>
 
       {/* Table */}
       <div className="overflow-x-auto shadow-lg rounded-lg">
-        <table className="w-full text-left text-gray-600 dark:text-gray-300 border-collapse">
+        <table className="w-full text-gray-600 dark:text-gray-300 border-collapse">
           <thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 uppercase text-sm">
             <tr>
-              <th className="px-6 py-3">Image</th>
-              <th className="px-6 py-3">Product</th>
-              <th className="px-6 py-3 flex justify-between items-center">
-                Action
-                <button
-                  onClick={() => setIsAddOpen(true)}
-                  className="ml-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center transition-transform transform hover:-translate-y-0.5 hover:scale-105"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add
-                </button>
-              </th>
+              <th className="px-6 py-3 text-center">Image</th>
+              <th className="px-6 py-3 text-center">Product</th>
+              <th className="px-6 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
-            {products.length > 0 ? (
-              products.map((product, index) => (
+            {currentProducts.length > 0 ? (
+              currentProducts.map((product, index) => (
                 <tr
                   key={product._id}
                   className={`${index % 2 === 0
-                    ? "bg-white dark:bg-gray-800"
-                    : "bg-gray-50 dark:bg-gray-700"
+                      ? "bg-white dark:bg-gray-800"
+                      : "bg-gray-50 dark:bg-gray-700"
                     } hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300`}
                 >
-                  <td className="px-6 py-4">
+                  {/* Image centered */}
+                  <td className="px-6 py-4 text-center">
                     <img
                       src={product.image}
                       alt={product.productName}
-                      className="w-20 h-20 object-cover rounded transition-transform duration-300 hover:scale-105"
+                      className="w-20 h-20 object-cover rounded transition-transform duration-300 hover:scale-105 mx-auto"
                     />
                   </td>
-                  <td className="px-6 py-4 font-semibold dark:text-white">
+                  {/* Product name centered */}
+                  <td className="px-6 py-4 font-semibold dark:text-white text-center">
                     {product.productName}
                   </td>
-                  <td className="px-6 py-4 flex justify-center items-center gap-4">
-                    <button
-                      onClick={() => {
-                        setEditingProduct(product);
-                        setEditName(product.productName);
-                      }}
-                      className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
-                    >
-                      <Pencil />
-                    </button>
-                    <button
-                      onClick={() => removeProduct(product._id)}
-                      className="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110"
-                    >
-                      <Trash2 />
-                    </button>
+                  {/* Action icons centered */}
+                  <td className="px-6 py-4">
+                    <div className="flex justify-center items-center gap-6">
+                      <button
+                        onClick={() => {
+                          setEditingProduct(product);
+                          setEditName(product.productName);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
+                      >
+                        <Pencil className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => removeProduct(product._id)}
+                        className="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -166,8 +194,16 @@ const Product = () => {
         </table>
       </div>
 
-      {/* Add Product Modal */}
+      {/* Pagination */}
+      {filterProducts.length > productsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
+      {/* Add Product Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 transform transition-transform duration-300 scale-95 opacity-0 animate-fadeIn">

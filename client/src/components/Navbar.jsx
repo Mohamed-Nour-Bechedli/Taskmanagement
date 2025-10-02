@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [userFirstName, setUserFirstName] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -15,11 +17,25 @@ const Navbar = () => {
         console.error("Invalid token");
       }
     }
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
+    setDropdownOpen(false);
   };
 
   return (
@@ -35,18 +51,41 @@ const Navbar = () => {
             ProductManager
           </span>
         </a>
-        <div className="flex items-center gap-3">
+
+        <div className="relative" ref={dropdownRef}>
           {userFirstName && (
             <>
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-                {userFirstName.charAt(0).toUpperCase()}
-              </div>
+              {/* User Avatar */}
               <button
-                onClick={handleLogout}
-                className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold focus:outline-none"
               >
-                Logout
+                {userFirstName.charAt(0).toUpperCase()}
               </button>
+
+              {/* Dropdown */}
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-gray-700 divide-y divide-gray-100 rounded-lg shadow-md z-50">
+                  <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                    <li>
+                      <button
+                        onClick={handleProfile}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                        Profile
+                      </button>
+                    </li>
+                  </ul>
+                  <div className="py-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

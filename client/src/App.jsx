@@ -1,19 +1,28 @@
 import './App.css';
-import { Route, Routes, Navigate} from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Hero from './components/Hero';
-import Login from './components/Login'
+import Login from './components/Login';
 import Signup from './components/Signup';
+import Profile from './components/Profile';
 
 function App() {
-
-  const user = localStorage.getItem('token');
-
   return (
     <Routes>
-      <Route path='/' element={user ? <Hero /> : <Navigate to='/login' />} />
-      <Route path='/signup' element={<Signup />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='*' element={<Navigate  replace to='/login' />} />
+      <Route
+        path="/"
+        element={
+          localStorage.getItem('token') ? <Hero /> : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          localStorage.getItem('token') ? <Profile /> : <Navigate to="/login" />
+        }
+      />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="*" element={<Navigate replace to="/login" />} />
     </Routes>
   );
 }
