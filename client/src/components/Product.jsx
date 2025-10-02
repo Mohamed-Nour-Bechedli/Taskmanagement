@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Trash2, Pencil, Plus } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -27,11 +29,19 @@ const Product = () => {
   }, []);
 
   const removeProduct = async (id) => {
+
+    const confirmed = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmed) return;
+
     try {
       await axios.delete(`http://localhost:5000/api/products/${id}`);
       setProducts((prev) => prev.filter((p) => p._id !== id));
+
+      toast.info("Product deleted successfully");
+
     } catch (err) {
       console.error(err);
+      toast.error("Failed to delete product");
     }
   };
 
@@ -50,8 +60,12 @@ const Product = () => {
       setImage(null);
       setIsAddOpen(false);
       fetchData();
+
+      toast.success("Product added successfully!");
+
     } catch (err) {
       console.error(err);
+      toast.error("Failed to add product");
     }
   };
 
@@ -79,7 +93,11 @@ const Product = () => {
   };
 
   return (
+
     <div className="max-w-6xl mx-auto mt-8">
+
+      <ToastContainer position="top-right" autoClose={2000} />
+
       {/* Table */}
       <div className="overflow-x-auto shadow-lg rounded-lg">
         <table className="w-full text-left text-gray-600 dark:text-gray-300 border-collapse">
@@ -104,8 +122,8 @@ const Product = () => {
                 <tr
                   key={product._id}
                   className={`${index % 2 === 0
-                      ? "bg-white dark:bg-gray-800"
-                      : "bg-gray-50 dark:bg-gray-700"
+                    ? "bg-white dark:bg-gray-800"
+                    : "bg-gray-50 dark:bg-gray-700"
                     } hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300`}
                 >
                   <td className="px-6 py-4">
@@ -149,7 +167,7 @@ const Product = () => {
       </div>
 
       {/* Add Product Modal */}
-      
+
       {isAddOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 transform transition-transform duration-300 scale-95 opacity-0 animate-fadeIn">
