@@ -1,5 +1,4 @@
 const { User } = require('../models/User');
-const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const loggIn = async (req, res) => {
@@ -20,14 +19,5 @@ const loggIn = async (req, res) => {
     }
 };
 
-const validater = (data) => {
-    if (!validator.isEmail(data.email)) {
-        return { error: { details: [{ message: "Invalid email" }] } };
-    }
-    if (!validator.isStrongPassword(data.password)) {
-        return { error: { details: [{ message: "Weak password" }] } };
-    }
-    return { };
-};
 
 module.exports = { loggIn };

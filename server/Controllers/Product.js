@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const path = require('path');
 const fs = require('fs');
+require ('dotenv').config();
 
 // Get all products
 const fetchProduct = async (req, res) => {
