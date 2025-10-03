@@ -10,7 +10,7 @@ const fetchProduct = async (req, res) => {
 
         const formattedProduct = product.map((el) => ({
             ...el.toObject(),
-            image: el.image ? `http://localhost:5000/${el.image}` : null
+            image: el.image ? `${process.env.BASE_URL}${el.image}` : null
         }))
 
         res.status(200).json(formattedProduct);
@@ -33,7 +33,7 @@ const createProduct = async (req, res) => {
 
         res.status(201).json({
             ...newProduct.toObject(),
-            image: newProduct.image ? `http://localhost:5000/${newProduct.image}` : null
+            image: newProduct.image ? `${process.env.BASE_URL}${newProduct.image}` : null
         });
 
     } catch (error) {
@@ -67,7 +67,7 @@ const updateProduct = async (req, res) => {
         await product.save();
         res.json({
             ...product.toObject(),
-            image: product.image ? `http://localhost:5000/${product.image}` : null
+            image: product.image ? `${process.env.BASE_URL}${product.image}` : null
         });
     } catch (error) {
         console.error(error);

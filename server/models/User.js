@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.generateAuthToken = function() {
     const token = jsonwebtoken.sign({
         _id : this._id,
-        email : this.email
+        email : this.email,
+        firstName : this.firstName
     }, process.env.JWT_SECRET, { expiresIn : '1h'});
     return token;
 };

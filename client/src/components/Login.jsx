@@ -1,36 +1,27 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/Axios";
 
 const Login = () => {
-    const [data, setData] = useState({
-        email: "",
-        password: ""
-    });
-
+    const [data, setData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setData({ ...data, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "http://localhost:5000/api/auth/login";
-            const { data: res } = await axios.post(url, data);
-            console.log("Login response:", res);
+            const res = await api.post("/auth/login", data);
 
-            localStorage.setItem("token", res.data);
+            if (res.data.token) {
+                localStorage.setItem("token", res.data.token); 
+            }
+
             navigate("/");
-        } catch (error) {
-            if (
-                error.response &&
-                error.response.status >= 400 &&
-                error.response.status <= 500
-            ) {
-                setError(error.response.data.message);
+        } catch (err) {
+            if (err.response?.status >= 400 && err.response?.status <= 500) {
+                setError(err.response.data.message);
             }
         }
     };

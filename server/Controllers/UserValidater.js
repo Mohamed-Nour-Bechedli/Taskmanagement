@@ -1,6 +1,5 @@
 const { check, validationResult } = require('express-validator');
 
-// Registration validation rules
 const registerValidation = [
     check('firstName')
         .isAlpha().withMessage('First name must contain only letters')

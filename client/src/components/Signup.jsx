@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/Axios";
 
 const Signup = () => {
     const [data, setData] = useState({
@@ -12,19 +12,16 @@ const Signup = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setData({ ...data, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "http://localhost:5000/api/users/register";
-            const { data: res } = await axios.post(url, data);
-            console.log(res.message);
+            await api.post("/users/register", data);
+
             navigate("/login");
         } catch (err) {
-            if (err.response && err.response.status >= 400 && err.response.status <= 500) {
+            if (err.response?.status >= 400 && err.response?.status <= 500) {
                 setError(err.response.data.message);
             }
         }

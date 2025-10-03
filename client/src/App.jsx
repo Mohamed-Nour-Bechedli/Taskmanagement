@@ -1,4 +1,3 @@
-import './App.css';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Hero from './components/Hero';
 import Login from './components/Login';

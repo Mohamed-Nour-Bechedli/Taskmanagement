@@ -1,5 +1,5 @@
 import Navbar from './Navbar';
-import Product from './Product';
+import Product from './Product/Product';
 
 const Hero = () => {
 

@@ -13,7 +13,7 @@ const loggIn = async (req, res) => {
             return res.status(400).json({ message : 'Email or Password is wrong' });
         }
         const token = user.generateAuthToken();
-        res.status(200).json({ data : token, message : 'logged in successfully!'})
+        res.status(200).json({ token, message : 'logged in successfully!'})
     } catch (error) {
         res.status(500).json({ message : 'Internal Server Error' });
     }

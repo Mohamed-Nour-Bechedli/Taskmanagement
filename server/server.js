@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const usersRoutes = require('./routes/Users');
 const authRoutes = require('./routes/Auth');
 const productRoutes = require('./routes/Product');
 const path = require('path');
+const connectDB = require('./connectDB');
 
 const app = express();
 
@@ -19,11 +19,10 @@ app.use('/api/users', usersRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
-// connect to MongoDB
-mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.log(err));
+// Connect to MongoDB
+connectDB();
 
+// Start th server
 const port = 5000;
 
 app.listen(port, () => {

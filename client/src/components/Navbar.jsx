@@ -15,7 +15,10 @@ const Navbar = () => {
         setUserFirstName(payload.firstName || "U");
       } catch (err) {
         console.error("Invalid token");
+        setUserFirstName("U"); 
       }
+    } else {
+      setUserFirstName("U"); 
     }
 
     // Close dropdown when clicking outside
@@ -38,6 +41,8 @@ const Navbar = () => {
     setDropdownOpen(false);
   };
 
+  const displayLetter = userFirstName.charAt(0).toUpperCase();
+
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
@@ -53,40 +58,34 @@ const Navbar = () => {
         </a>
 
         <div className="relative" ref={dropdownRef}>
-          {userFirstName && (
-            <>
-              {/* User Avatar */}
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold focus:outline-none"
-              >
-                {userFirstName.charAt(0).toUpperCase()}
-              </button>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold focus:outline-none"
+          >
+            {displayLetter}
+          </button>
 
-              {/* Dropdown */}
-              {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-gray-700 divide-y divide-gray-100 rounded-lg shadow-md z-50">
-                  <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                    <li>
-                      <button
-                        onClick={handleProfile}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        Profile
-                      </button>
-                    </li>
-                  </ul>
-                  <div className="py-2">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-gray-700 divide-y divide-gray-100 rounded-lg shadow-md z-50">
+              <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                <li>
+                  <button
+                    onClick={handleProfile}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Profile
+                  </button>
+                </li>
+              </ul>
+              <div className="py-2">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                >
+                  Sign out
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
