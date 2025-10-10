@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import api from '../../api/Axios';
 import { toast } from "react-toastify";
 
@@ -15,8 +15,30 @@ export default function ProductModals({
     const [image, setImage] = useState(null);
     const [editName, setEditName] = useState(editingProduct?.productName || "");
     const [editImage, setEditImage] = useState(null);
+
+    const addModalRef = useRef(null);
+    const editModalRef = useRef(null);
+    const deleteModalRef = useRef(null);
     const fileInputRef = useRef(null);
 
+    // Close modal when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (isAddOpen && addModalRef.current && !addModalRef.current.contains(e.target)) {
+                setIsAddOpen(false);
+            }
+            if (editingProduct && editModalRef.current && !editModalRef.current.contains(e.target)) {
+                setEditingProduct(null);
+            }
+            if (productToDelete && deleteModalRef.current && !deleteModalRef.current.contains(e.target)) {
+                setProductToDelete(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isAddOpen, editingProduct, productToDelete, setIsAddOpen, setEditingProduct, setProductToDelete]);
+
+    // Add product
     const handleAddProduct = async (e) => {
         e.preventDefault();
         try {
@@ -29,12 +51,15 @@ export default function ProductModals({
             });
 
             setName(""); setImage(null); setIsAddOpen(false);
-            fetchData(); toast.success("Product added successfully!");
+            fetchData();
+            toast.success("Product added successfully!");
         } catch (err) {
-            console.error(err); toast.error("Failed to add product");
+            console.error(err);
+            toast.error("Failed to add product");
         }
     };
 
+    // Update product
     const handleUpdate = async (e) => {
         e.preventDefault();
         if (!editingProduct) return;
@@ -48,32 +73,35 @@ export default function ProductModals({
             });
 
             setEditingProduct(null); setEditName(""); setEditImage(null);
-            fetchData(); toast.success("Product updated");
+            fetchData();
+            toast.success("Product updated successfully!");
         } catch (err) {
-            console.error(err); toast.error("Failed to update product");
+            console.error(err);
+            toast.error("Failed to update product");
         }
     };
 
+    // Delete product
     const confirmDelete = async () => {
         if (!productToDelete) return;
         try {
             await api.delete(`/products/${productToDelete._id}`);
-            fetchData(); setProductToDelete(null);
-            toast.info("Product deleted successfully");
+            fetchData();
+            setProductToDelete(null);
+            toast.info("Product deleted successfully!");
         } catch (err) {
-            console.error(err); toast.error("Failed to delete product");
+            console.error(err);
+            toast.error("Failed to delete product");
         }
     };
 
     return (
         <>
-            {/* Add Modal */}
+
             {isAddOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                            Create New Product
-                        </h3>
+                    <div ref={addModalRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Create New Product</h3>
                         <form onSubmit={handleAddProduct} className="space-y-4">
                             <input
                                 type="text" value={name} onChange={(e) => setName(e.target.value)}
@@ -93,10 +121,9 @@ export default function ProductModals({
                 </div>
             )}
 
-            {/* Edit Modal */}
             {editingProduct && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+                    <div ref={editModalRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
                         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Edit Product</h3>
                         <form onSubmit={handleUpdate} className="space-y-4">
                             <input
@@ -118,10 +145,9 @@ export default function ProductModals({
                 </div>
             )}
 
-            {/* Delete Modal */}
             {productToDelete && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-sm p-6">
+                    <div ref={deleteModalRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-sm p-6">
                         <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Delete Product</h3>
                         <p className="mb-4 dark:text-gray-300">
                             Are you sure you want to delete <strong>{productToDelete.productName}</strong>?
